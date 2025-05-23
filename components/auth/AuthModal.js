@@ -88,7 +88,7 @@ export default function AuthModal({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isLoginView ? "Login to Lead Flow" : "Create Account"}>
       <div className="p-6 sm:p-8">
-        {error && <p className="mb-4 text-center text-sm text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400 p-3 rounded-md">{error}</p>}
+        {error && <p className="mb-4 text-center text-sm text-white p-3 rounded-md">{error}</p>}
         {isLoginView ? (
           <form onSubmit={handleEmailLogin} className="space-y-6">
             <div>

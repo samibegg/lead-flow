@@ -1,9 +1,38 @@
 // app/page.js
-import React from 'react';
+'use client'; 
+
+import React, { useContext } from 'react'; // Added useContext
 import Link from 'next/link';
 import { Users, MapPin, BarChart3, Target } from 'lucide-react'; 
+import { useSession } from 'next-auth/react'; 
+import { useModal } from '@/context/ModalContext'; // Import useModal hook
 
-export default function HomePage() {
+export default function HomePage() { 
+  const { data: session, status } = useSession();
+  const { openAuthModal } = useModal(); // Use context to get openAuthModal
+  const isLoadingSession = status === "loading";
+
+  const handleFeatureClick = (e, href) => {
+    if (isLoadingSession) {
+      e.preventDefault(); 
+      return;
+    }
+    if (!session) { 
+      e.preventDefault(); 
+      if (openAuthModal) {
+        openAuthModal();
+      } else {
+        console.error("openAuthModal function not available from context.");
+      }
+    }
+  };
+  
+  const features = [
+    { href: "/contacts", icon: Users, title: "Manage Contacts", desc: "View, edit, and organize your valuable leads.", iconColor: "text-indigo-500 dark:text-indigo-400" },
+    { href: "/map", icon: MapPin, title: "View Lead Map", desc: "Visualize the geographical distribution of your leads.", iconColor: "text-teal-500 dark:text-teal-400" },
+    { href: "#", icon: BarChart3, title: "Analytics", desc: "Gain insights into your lead pipeline (Coming Soon).", iconColor: "text-amber-500 dark:text-amber-400" }
+  ];
+
   return (
     <div className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-4xl mx-auto text-center">
@@ -17,14 +46,11 @@ export default function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-        {[
-          { href: "/contacts", icon: Users, title: "Manage Contacts", desc: "View, edit, and organize your valuable leads.", iconColor: "text-indigo-500 dark:text-indigo-400" },
-          { href: "/map", icon: MapPin, title: "View Lead Map", desc: "Visualize the geographical distribution of your leads.", iconColor: "text-teal-500 dark:text-teal-400" },
-          { href: "#", icon: BarChart3, title: "Analytics", desc: "Gain insights into your lead pipeline (Coming Soon).", iconColor: "text-amber-500 dark:text-amber-400" }
-        ].map((item) => (
+        {features.map((item) => (
           <Link 
             key={item.title}
-            href={item.href} 
+            href={(session || isLoadingSession || item.href === '#') ? item.href : '#'} 
+            onClick={(e) => handleFeatureClick(e, item.href)}
             className="group block p-6 sm:p-8 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg hover:shadow-xl dark:hover:shadow-slate-700/60 transform hover:-translate-y-1 transition-all duration-300 ease-in-out border border-border-light dark:border-border-dark"
           >
             <div className="flex flex-col items-center text-center">

@@ -4,10 +4,13 @@
 import React, { useState, useEffect } from 'react'; 
 import Header from './Header';
 import Footer from './Footer';
-import AuthModal from '@/components/auth/AuthModal'; 
+// AuthModal is now rendered globally by ModalProvider
+// import AuthModal from '@/components/auth/AuthModal'; 
+import { ModalProvider } from '@/context/ModalContext'; // Import ModalProvider
 
 export default function ClientLayout({ children }) {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  // AuthModal state and functions are now managed by ModalProvider
+  // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [theme, setTheme] = useState('light'); 
 
   useEffect(() => {
@@ -36,27 +39,20 @@ export default function ClientLayout({ children }) {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  const openAuthModal = () => {
-    console.log("ClientLayout: openAuthModal called, setting isAuthModalOpen to true");
-    setIsAuthModalOpen(true);
-  };
-  const closeAuthModal = () => {
-    console.log("ClientLayout: closeAuthModal called, setting isAuthModalOpen to false");
-    setIsAuthModalOpen(false);
-  };
-
-  useEffect(() => {
-    console.log("ClientLayout: isAuthModalOpen state changed to:", isAuthModalOpen);
-  }, [isAuthModalOpen]);
+  // openAuthModal and closeAuthModal will be provided by ModalContext if needed by Header directly
+  // For now, Header will also consume the context for opening the modal.
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header onLoginSignupClick={openAuthModal} onToggleTheme={toggleTheme} currentTheme={theme} />
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8"> 
-        {children}
-      </main>
-      <Footer />
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
-    </div>
+    <ModalProvider> {/* Wrap with ModalProvider */}
+      <div className="flex flex-col min-h-screen">
+        {/* Header will get openAuthModal from context if needed, or ClientLayout can pass it */}
+        <Header onToggleTheme={toggleTheme} currentTheme={theme} />
+        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8"> 
+          {children}
+        </main>
+        <Footer />
+        {/* AuthModal is rendered inside ModalProvider */}
+      </div>
+    </ModalProvider>
   );
 }

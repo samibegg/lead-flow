@@ -1,23 +1,22 @@
 // components/layout/Header.js
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react'; // Added useContext
 import Link from 'next/link';
-import { LogIn, Target, Sun, Moon, LogOut } from 'lucide-react'; // Ensure LogOut is imported if used
-import { useSession, signOut } from 'next-auth/react';
+import { LogIn, Target, Sun, Moon, LogOut } from 'lucide-react'; 
+import { useSession, signOut } from 'next-auth/react'; 
+import { useModal } from '@/context/ModalContext'; // Import useModal
 
-export default function Header({ onLoginSignupClick, onToggleTheme, currentTheme }) {
-  const { data: session, status } = useSession(); // Get status as well
-
-  //console.log('Session Status in Header:', status);
-  //console.log('Session Data in Header:', session);
-
+export default function Header({ onToggleTheme, currentTheme }) { // Removed onLoginSignupClick prop
+  const { data: session, status } = useSession(); 
+  const { openAuthModal } = useModal(); // Get openAuthModal from context
   const isLoadingSession = status === "loading";
 
   const handleLoginClick = () => {
-    console.log("Header: Login/Signup button clicked!");
-    if (onLoginSignupClick) {
-        onLoginSignupClick();
+    if (openAuthModal) {
+        openAuthModal();
+    } else {
+      console.error("Header: openAuthModal function not available from context.");
     }
   };
 
@@ -29,15 +28,17 @@ export default function Header({ onLoginSignupClick, onToggleTheme, currentTheme
           Lead Flow
         </Link>
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Navigation Links */}
-          <Link href="/contacts" className="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium">
-            Contacts
-          </Link>
-          <Link href="/map" className="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium">
-            Map
-          </Link>
-
-          {/* Theme Toggle Button */}
+          {session && ( 
+            <>
+              <Link href="/contacts" className="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium">
+                Contacts
+              </Link>
+              <Link href="/map" className="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium">
+                Map
+              </Link>
+            </>
+          )}
+          
           <button
             onClick={onToggleTheme}
             className="p-2 rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark transition-colors"
@@ -46,27 +47,21 @@ export default function Header({ onLoginSignupClick, onToggleTheme, currentTheme
             {currentTheme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
-          {/* Auth Buttons */}
           {isLoadingSession ? (
-            <div className="w-24 h-9 bg-slate-200 dark:bg-slate-700 animate-pulse rounded-md"></div> // Loading placeholder
+            <div className="w-24 h-9 bg-slate-200 dark:bg-slate-700 animate-pulse rounded-md"></div> 
           ) : session ? (
             <div className="flex items-center">
-              {/* Optional: Display user name
-              <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark mr-3 hidden sm:inline">
-                {session.user?.name || session.user?.email}
-              </span>
-              */}
               <button 
-                onClick={() => signOut()} 
+                onClick={() => signOut({ callbackUrl: '/' })} 
                 className="flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-md text-sm transition-colors"
               >
-                <LogOut size={16} className="mr-1.5" /> 
+                <LogOut size={16} className="mr-1.5" />
                 Logout
               </button>
             </div>
           ) : (
             <button
-              onClick={onLoginSignupClick}
+              onClick={handleLoginClick} // Use the internal handler that uses context
               className="flex items-center bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark text-black font-semibold py-2 px-4 rounded-md transition-colors text-sm shadow-sm"
             >
               <LogIn size={16} className="mr-1.5" />
