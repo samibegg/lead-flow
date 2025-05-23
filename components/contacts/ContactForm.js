@@ -102,7 +102,7 @@ export default function ContactForm({ initialData = {}, onSubmit, isSaving, onCa
         <button
           type="submit"
           disabled={isSaving}
-          className="w-full sm:w-auto flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 transition-colors disabled:opacity-50"
+          className="w-full sm:w-auto flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-black bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 transition-colors disabled:opacity-50"
         >
           <Save size={18} className="inline mr-2" />
           {isSaving ? 'Saving...' : 'Save Contact'}

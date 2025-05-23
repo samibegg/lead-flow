@@ -67,7 +67,7 @@ export default function Header({ onLoginSignupClick, onToggleTheme, currentTheme
           ) : (
             <button
               onClick={onLoginSignupClick}
-              className="flex items-center bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark text-white font-semibold py-2 px-4 rounded-md transition-colors text-sm shadow-sm"
+              className="flex items-center bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark text-black font-semibold py-2 px-4 rounded-md transition-colors text-sm shadow-sm"
             >
               <LogIn size={16} className="mr-1.5" />
               Login / Signup
