@@ -28,7 +28,11 @@ export async function POST(request) {
     const messages = [
       {
         role: "system",
-        content: "You are an expert email copywriter. Polish the following sales email content. Make it more professional, concise, and engaging. Ensure a friendly yet assertive tone. Correct any grammatical errors or awkward phrasing. The email is intended for a business lead."
+        content: `You are an expert email copywriter. Polish the following sales email content. 
+        Make it more professional, concise, and engaging. Ensure a friendly yet assertive tone.
+        Modify the organization_name to make it more conversational (for ex: 
+        "ABC Technologies Inc." should be "ABC Tech","Johnson Robo LLC" should be "Johnson Robo", "XYZ Solutions should be XYZ", and so on.)
+        Correct any grammatical errors or awkward phrasing. The email is intended for a business lead.`
       },
       {
         role: "user",
