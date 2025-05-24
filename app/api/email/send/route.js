@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from '@/lib/authOptions';
+import { connectToDatabase } from '@/lib/mongodb';
 import { sendEmail } from '@/lib/mailgun'; // Import our Mailgun helper
 
 export async function POST(request) {
