@@ -18,19 +18,35 @@ export default function EmailComposer({ contact }) {
   const [sendStatus, setSendStatus] = useState({ message: '', type: '' }); 
   
   const emailTemplates = [
-    { id: 'intro', name: 'Introduction Email', subject: `Intro: {{contact.first_name}} from {{user.company}}`, body: `Hi {{contact.first_name}},\n\nMy name is {{user.name}} from {{user.company}}. I wanted to reach out because...\n\nBest,\n{{user.name}}` },
-    { id: 'followup', name: 'Follow-up Email', subject: `Following up: {{contact.first_name}}`, body: `Hi {{contact.first_name}},\n\nJust wanted to follow up on our previous conversation about...\n\nThanks,\n{{user.name}}` },
+    { id: 'aifocus', name: 'AI Outreach Email', 
+      subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
+      body: `Hi {{contact.first_name}}, hope you are well.\n
+Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
+Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
+Limited availability!\n
+Reply if interested - Thank You,\n\n
+Alex\n
+Principal AI Engineer
+Forge Mission
+Alexandra.Hamilton@mail.forgemission.com\n` 
+    },
+    { id: 'intro', name: 'Introduction Email', 
+      subject: `Intro: {{contact.first_name}} from {{user.company}}`, 
+      body: `Hi {{contact.first_name}},\n\nMy name is {{user.name}} from {{user.company}}. I wanted to reach out because...\n\nBest,\n{{user.name}}` },
+    { id: 'followup', name: 'Follow-up Email', 
+      subject: `Following up: {{contact.first_name}}`, 
+      body: `Hi {{contact.first_name}},\n\nJust wanted to follow up on our previous conversation about...\n\nThanks,\n{{user.name}}` },
   ];
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
 
   useEffect(() => {
     if (session?.user?.email) {
-      setFromAddress(session.user.email);
+      setFromAddress("Alexandra.Hamilton@mail.forgemission.com");
     } else {
       // Fallback if session or email is not available, though ideally user should be logged in.
       // Ensure this domain is verified with Mailgun.
-      setFromAddress("your-default-sending-address@yourdomain.com"); 
+      setFromAddress("Alexandra.Hamilton@mail.forgemission.com"); 
     }
   }, [session]);
 
