@@ -21,7 +21,7 @@ export default function Header({ onToggleTheme, currentTheme }) { // Removed onL
   };
 
   return (
-    <header className="bg-surface-light dark:bg-surface-dark shadow-md sticky top-0 z-50 border-b border-border-light dark:border-border-dark">
+    <header className="bg-white dark:bg-surface-dark shadow-md sticky top-0 z-50 border-b border-border-light dark:border-border-dark">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
         <Link href="/" className="flex items-center text-2xl font-bold text-primary dark:text-primary-dark hover:opacity-80 transition-opacity">
           <Target size={28} className="mr-2"/>
