@@ -109,7 +109,7 @@ export default function AuthModal({ isOpen, onClose }) {
                 <input type="password" name="password" id="password-login" required className="w-full pl-10 pr-3 py-2.5 border border-border-light dark:border-border-dark bg-surface-light dark:bg-slate-700 text-text-primary-light dark:text-text-primary-dark rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark focus:border-primary dark:focus:border-primary-dark" placeholder="••••••••" />
               </div>
             </div>
-            <button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary-hover-light dark:bg-primary-dark dark:hover:bg-primary-hover-dark text-white font-semibold py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 disabled:opacity-70">
+            <button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-700 dark:bg-primary-dark dark:hover:bg-primary-hover-dark text-white font-semibold py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 disabled:opacity-70">
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
@@ -139,7 +139,7 @@ export default function AuthModal({ isOpen, onClose }) {
           <div className="flex-grow border-t border-border-light dark:border-border-dark"></div>
         </div>
 
-        <button onClick={handleGoogleLogin} disabled={loading} className="w-full flex items-center justify-center py-2.5 px-4 border border-border-light dark:border-border-dark rounded-md shadow-sm bg-surface-light dark:bg-slate-700 text-sm font-medium text-text-primary-light dark:text-text-primary-dark hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 disabled:opacity-70">
+        <button onClick={handleGoogleLogin} disabled={loading} className="w-full flex items-center justify-center py-2.5 px-4 border border-border-light dark:border-border-dark rounded-md shadow-sm bg-stone-200 dark:bg-slate-700 text-sm font-medium text-text-primary-light dark:text-text-primary-dark hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-900 disabled:opacity-70">
           <img src="https://www.google.com/favicon.ico" alt="Google icon" className="w-5 h-5 mr-2"/>
           Continue with Google
         </button>

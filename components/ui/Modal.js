@@ -25,7 +25,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
       onClick={onClose} 
     >
       <div 
-        className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-md transform transition-all"
+        className="bg-slate-300 dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-md transform transition-all"
         onClick={(e) => e.stopPropagation()} 
       >
         <div className="flex justify-between items-center p-5 border-b border-border-light dark:border-border-dark">
