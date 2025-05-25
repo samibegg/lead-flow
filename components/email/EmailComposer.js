@@ -1,89 +1,107 @@
 // components/email/EmailComposer.js
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Send, Sparkles, Paperclip, Trash2, RotateCcw, ChevronDown } from 'lucide-react';
-import { useSession } from 'next-auth/react'; // To get current user's email for 'from' field
+import React, { useState, useEffect, useCallback } from 'react';
+import { Send, Sparkles, ChevronDown } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// Predefined list of "From" email addresses
+const senderEmails = [
+  "bill.johnson@mail.forgemission.com",
+  "john.smith@mail.forgemission.com",
+  "al.green@mail.forgemission.com",
+  "joe.thomson@mail.forgemission.com",
+  "tom.jones@mail.forgemission.com"
+];
 
-export default function EmailComposer({ contact }) {
-  const { data: session } = useSession();
-  const [fromAddress, setFromAddress] = useState(''); 
+// Helper function to extract a display name from an email
+const getNameFromEmail = (email) => {
+  if (!email) return 'Your Name'; // Fallback name
+  const namePart = email.split('@')[0];
+  // Capitalize first letter of each part (e.g., bill.johnson -> Bill Johnson)
+  return namePart
+    .split(/[._-]/) // Split by dot, underscore, or hyphen
+    .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+    .join(' ');
+};
+
+export default function EmailComposer({ contact, onEmailSent }) { // Added onEmailSent prop
+  const { data: session } = useSession(); // Still useful if you want to use session.user.company or other details
+  const [fromAddress, setFromAddress] = useState(senderEmails[0]); // Default to the first email
   const [subject, setSubject] = useState('');
-  const [textBody, setTextBody] = useState(''); 
-  const [htmlBody, setHtmlBody] = useState(''); 
+  const [textBody, setTextBody] = useState('');
+  const [htmlBody, setHtmlBody] = useState(''); // Kept for potential future rich text editor
   const [isSending, setIsSending] = useState(false);
   const [isPolishing, setIsPolishing] = useState(false);
-  const [sendStatus, setSendStatus] = useState({ message: '', type: '' }); 
-  
+  const [sendStatus, setSendStatus] = useState({ message: '', type: '' });
+
   const emailTemplates = [
+    { id: 'blank', name: '-- No Template --', subject: '', body: `\n\nBest,\n{{user.name}}` }, // Default blank with signature
+    { id: 'intro', name: 'Introduction Email',
+      subject: `Intro: {{contact.first_name}} from {{user.company}}`,
+      body: `Hi {{contact.first_name}},\n\nMy name is {{user.name}} from {{user.company}}. I wanted to reach out because...\n\nBest,\n{{user.name}}` },
+    { id: 'followup', name: 'Follow-up Email',
+      subject: `Following up: {{contact.first_name}}`,
+      body: `Hi {{contact.first_name}},\n\nJust wanted to follow up on our previous conversation about...\n\nThanks,\n{{user.name}}` },
     { id: 'aifocus', name: 'AI Outreach Email', 
-      subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
-      body: `Hi {{contact.first_name}}, hope you are well.\n
+        subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
+        body: `Hi {{contact.first_name}}, hope you are well.\n
 Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
 Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
 Limited availability!\n
 Reply if interested - Thank You,\n\n
-Alex\n
+{{user.name}}
 Principal AI Engineer
-Forge Mission
-Alexandra.Hamilton@mail.forgemission.com\n` 
-    },
-    { id: 'intro', name: 'Introduction Email', 
-      subject: `Intro: {{contact.first_name}} from {{user.company}}`, 
-      body: `Hi {{contact.first_name}},\n\nMy name is {{user.name}} from {{user.company}}. I wanted to reach out because...\n\nBest,\n{{user.name}}` },
-    { id: 'followup', name: 'Follow-up Email', 
-      subject: `Following up: {{contact.first_name}}`, 
-      body: `Hi {{contact.first_name}},\n\nJust wanted to follow up on our previous conversation about...\n\nThanks,\n{{user.name}}` },
+Forge Mission\n` 
+      },  
   ];
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(emailTemplates.find(t => t.id === 'blank'));
 
-
-  useEffect(() => {
-    if (session?.user?.email) {
-      setFromAddress("Alexandra.Hamilton@mail.forgemission.com");
-    } else {
-      // Fallback if session or email is not available, though ideally user should be logged in.
-      // Ensure this domain is verified with Mailgun.
-      setFromAddress("Alexandra.Hamilton@mail.forgemission.com"); 
-    }
-  }, [session]);
-
-  const applyTemplate = (templateContent, contactData, userData) => {
+  // Function to replace placeholders
+  const applyTemplate = useCallback((templateContent, contactData, currentFromAddress) => {
+    if (!templateContent) return '';
     let processedContent = templateContent;
+
+    const senderName = getNameFromEmail(currentFromAddress);
+    const userData = {
+      name: senderName,
+      company: "Lead Flow App" // Placeholder, or derive from email domain, or use session.user.company
+    };
+
     if (contactData) {
       processedContent = processedContent.replace(/{{contact\.first_name}}/g, contactData.first_name || '');
       processedContent = processedContent.replace(/{{contact\.last_name}}/g, contactData.last_name || '');
       processedContent = processedContent.replace(/{{contact\.organization_name}}/g, contactData.organization_name || '');
     }
     if (userData) {
-      // Assuming session.user.name might be full name, and company isn't directly in session.
-      // You might need to fetch more user details or have a default company.
-      processedContent = processedContent.replace(/{{user\.name}}/g, userData.name || 'Your Name');
-      processedContent = processedContent.replace(/{{user\.company}}/g, userData.company || 'Your Company');
+      processedContent = processedContent.replace(/{{user\.name}}/g, userData.name);
+      processedContent = processedContent.replace(/{{user\.company}}/g, userData.company);
     }
     return processedContent;
-  };
+  }, []);
+
+  // Effect to update subject and body when template or fromAddress changes
+  useEffect(() => {
+    if (selectedTemplate && contact && fromAddress) {
+      const newSubject = applyTemplate(selectedTemplate.subject, contact, fromAddress);
+      const newBody = applyTemplate(selectedTemplate.body, contact, fromAddress);
+      setSubject(newSubject);
+      setTextBody(newBody);
+      setHtmlBody(''); // Clear HTML body when applying text-based templates
+    }
+  }, [selectedTemplate, contact, fromAddress, applyTemplate]);
 
   const handleTemplateChange = (e) => {
     const templateId = e.target.value;
     const template = emailTemplates.find(t => t.id === templateId);
     setSelectedTemplate(template);
-    if (template) {
-      const userData = { 
-        name: session?.user?.name, 
-        // company: session?.user?.company // if you add company to session user
-        company: "Lead Flow App" // Placeholder
-      };
-      setSubject(applyTemplate(template.subject, contact, userData));
-      setTextBody(applyTemplate(template.body, contact, userData));
-      setHtmlBody(''); 
-    } else {
-      setSubject('');
-      setTextBody('');
-      setHtmlBody('');
-    }
+    // The useEffect above will handle applying the template with the current fromAddress
+  };
+
+  const handleFromAddressChange = (e) => {
+    setFromAddress(e.target.value);
+    // The useEffect above will handle re-applying the template to update the signature
   };
 
   const handleSendEmail = async (e) => {
@@ -97,10 +115,11 @@ Alexandra.Hamilton@mail.forgemission.com\n`
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: contact.email,
-          from: fromAddress, 
+          from: fromAddress, // Use the selected fromAddress
           subject,
-          textBody, 
-          htmlBody: htmlBody || `<p>${textBody.replace(/\n/g, '<br>')}</p>`, 
+          textBody,
+          htmlBody: htmlBody || `<p>${textBody.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
+          contactId: contact._id,
         }),
       });
 
@@ -110,6 +129,16 @@ Alexandra.Hamilton@mail.forgemission.com\n`
         throw new Error(result.message || 'Failed to send email');
       }
       setSendStatus({ message: `Email sent successfully! (ID: ${result.mailgunId || 'N/A'})`, type: 'success' });
+
+      // Call the callback to refresh contact details in the parent page
+      if (onEmailSent) {
+        onEmailSent();
+      }
+
+      setSubject('');
+      setTextBody(''); // Or reset to a default template
+      setSelectedTemplate(emailTemplates.find(t => t.id === 'blank'));
+
     } catch (error) {
       console.error("Error sending email:", error);
       setSendStatus({ message: error.message || 'An error occurred.', type: 'error' });
@@ -119,7 +148,7 @@ Alexandra.Hamilton@mail.forgemission.com\n`
   };
 
   const handlePolishEmail = async () => {
-    const currentContent = textBody || htmlBody; // Prefer HTML body if it exists
+    const currentContent = textBody || htmlBody;
     if (!currentContent.trim()) {
         setSendStatus({ message: "Please write some email content before polishing.", type: 'error' });
         return;
@@ -134,10 +163,8 @@ Alexandra.Hamilton@mail.forgemission.com\n`
       });
       const data = await response.json();
       if (response.ok) {
-        // Assuming AI returns plain text, update textBody.
-        // If it returns HTML, you'd update htmlBody and potentially convert to textBody.
         setTextBody(data.polishedText);
-        setHtmlBody(''); // Clear HTML if we're setting text body
+        setHtmlBody('');
         setSendStatus({ message: "Email content polished by AI!", type: 'success' });
       } else {
         throw new Error(data.message || "Failed to polish email");
@@ -150,24 +177,31 @@ Alexandra.Hamilton@mail.forgemission.com\n`
     }
   };
 
-
   return (
     <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700">
       <form onSubmit={handleSendEmail} className="space-y-6">
-        <div>
-          <label htmlFor="from" className="block text-sm font-medium text-slate-700 dark:text-slate-300">From:</label>
-          <input
-            type="email"
-            id="from"
+        {/* From Address Dropdown */}
+        <div className="relative">
+          <label htmlFor="fromAddress" className="block text-sm font-medium text-slate-700 dark:text-slate-300">From:</label>
+          <select
+            id="fromAddress"
+            name="fromAddress"
             value={fromAddress}
-            onChange={(e) => setFromAddress(e.target.value)} 
+            onChange={handleFromAddressChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-            placeholder="your-email@yourverifieddomain.com"
-          />
-           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Ensure this email is from a domain verified with Mailgun.</p>
+            className="mt-1 block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200"
+          >
+            {senderEmails.map(email => (
+              <option key={email} value={email}>{getNameFromEmail(email)} ({email})</option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-slate-700 dark:text-slate-300">
+            <ChevronDown size={20} />
+          </div>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Ensure this email is from a domain verified with Mailgun.</p>
         </div>
 
+        {/* To Address (fixed to contact's email) */}
         <div>
           <label htmlFor="to" className="block text-sm font-medium text-slate-700 dark:text-slate-300">To:</label>
           <input
@@ -179,6 +213,7 @@ Alexandra.Hamilton@mail.forgemission.com\n`
           />
         </div>
         
+        {/* Email Template Selector */}
         <div className="relative">
           <label htmlFor="template" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Select Template:</label>
           <select
@@ -187,7 +222,6 @@ Alexandra.Hamilton@mail.forgemission.com\n`
             onChange={handleTemplateChange}
             className="mt-1 block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md appearance-none bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200"
           >
-            <option value="">-- No Template --</option>
             {emailTemplates.map(template => (
               <option key={template.id} value={template.id}>{template.name}</option>
             ))}
@@ -197,7 +231,7 @@ Alexandra.Hamilton@mail.forgemission.com\n`
           </div>
         </div>
 
-
+        {/* Subject */}
         <div>
           <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Subject:</label>
           <input
@@ -210,6 +244,7 @@ Alexandra.Hamilton@mail.forgemission.com\n`
           />
         </div>
 
+        {/* Email Body (Textarea for now) */}
         <div>
           <label htmlFor="textBody" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Email Body:</label>
           <textarea
