@@ -8,11 +8,11 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Predefined list of "From" email addresses
 const senderEmails = [
-  "bill.johnson@mail.forgemission.com",
-  "john.smith@mail.forgemission.com",
-  "al.green@mail.forgemission.com",
-  "joe.thomson@mail.forgemission.com",
-  "tom.jones@mail.forgemission.com"
+  "alexandra.hamilton@mail.forgemission.com",
+  "aaron.adams@mail.forgemission.com",
+  "sara.madison@mail.forgemission.com",
+  "allie.jackson@mail.forgemission.com",
+  "caitlyn.thomas@mail.forgemission.com"
 ];
 
 // Helper function to extract a display name from an email
@@ -38,19 +38,24 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
 
   const emailTemplates = [
     { id: 'blank', name: '-- No Template --', subject: '', body: `\n\nBest,\n{{user.name}}` }, // Default blank with signature
-    { id: 'intro', name: 'Introduction Email',
-      subject: `Intro: {{contact.first_name}} from {{user.company}}`,
-      body: `Hi {{contact.first_name}},\n\nMy name is {{user.name}} from {{user.company}}. I wanted to reach out because...\n\nBest,\n{{user.name}}` },
-    { id: 'followup', name: 'Follow-up Email',
-      subject: `Following up: {{contact.first_name}}`,
-      body: `Hi {{contact.first_name}},\n\nJust wanted to follow up on our previous conversation about...\n\nThanks,\n{{user.name}}` },
-    { id: 'aifocus', name: 'AI Outreach Email', 
+    { id: 'ai-intro', name: 'AI Intro', 
         subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
         body: `Hi {{contact.first_name}}, hope you are well.\n
 Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
 Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
 Limited availability!\n
 Reply if interested - Thank You,\n\n
+{{user.name}}
+Principal AI Engineer
+Forge Mission\n` 
+      },  
+    { id: 'ai-followup', name: 'AI Follow-up', 
+        subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
+        body: `{{contact.first_name}}, just making sure you didn't miss out.\n
+Following up to see if {{contact.organization_name}} would like free AI training starting this month.
+Forge Mission enables teams like yours to begin implementing agentic workflows, RAG and custom model training pipelines for your customers.
+The live virtual sessions are filling up now!\n
+Thank You,\n\n
 {{user.name}}
 Principal AI Engineer
 Forge Mission\n` 
