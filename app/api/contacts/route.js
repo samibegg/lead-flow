@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from '@/lib/authOptions'; 
 
-const ITEMS_PER_PAGE = 25; // <<-- CHANGED FROM 10 to 25
+const ITEMS_PER_PAGE = 25; // Default items per page
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -22,6 +22,7 @@ export async function GET(request) {
     const city = searchParams.get('city');
     const emailStatus = searchParams.get('emailStatus');
     const disqualificationStatus = searchParams.get('disqualificationStatus');
+    const openedEmailStatus = searchParams.get('openedEmailStatus'); // New filter
 
     const skip = (page - 1) * limit;
 
@@ -76,6 +77,19 @@ export async function GET(request) {
           { "disqualification.reasons": { "$exists": true, "$size": 0 } } 
         ]
       });
+    }
+
+    // Handle openedEmailStatus filter
+    if (openedEmailStatus === 'opened') {
+        andConditions.push({ "last_email_opened_timestamp": { "$exists": true, "$ne": null } });
+    } else if (openedEmailStatus === 'not_opened_sent') {
+        andConditions.push({
+            "email_history.0": { "$exists": true }, // Must have been emailed
+            "$or": [ // And not marked as opened
+                { "last_email_opened_timestamp": { "$exists": false } },
+                { "last_email_opened_timestamp": null }
+            ]
+        });
     }
     
     if (andConditions.length > 0) {
