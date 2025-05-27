@@ -41,6 +41,7 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
     { id: 'ai-intro', name: 'AI Intro', 
         subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
         body: `Hi {{contact.first_name}}, hope you are well.\n
+Impressed by your success in the {{contact.industry}} space. Does your team already have an AI execution strategy in place?\n
 Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
 Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
 Join us for a jumpstart - Limited availability!\n
