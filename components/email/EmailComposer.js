@@ -79,6 +79,7 @@ Forge Mission\n`
       processedContent = processedContent.replace(/{{contact\.first_name}}/g, contactData.first_name || '');
       processedContent = processedContent.replace(/{{contact\.last_name}}/g, contactData.last_name || '');
       processedContent = processedContent.replace(/{{contact\.organization_name}}/g, contactData.organization_name || '');
+      processedContent = processedContent.replace(/{{contact\.industry}}/g, contactData.industry || '');
     }
     if (userData) {
       processedContent = processedContent.replace(/{{user\.name}}/g, userData.name);

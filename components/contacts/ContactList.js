@@ -3,7 +3,7 @@ import React from 'react';
 import ContactItem from './ContactItem';
 
 // Add onDisqualifyClick to props
-export default function ContactList({ contacts, totalItems, currentPage, totalPages, onPageChange, itemsPerPage, onDisqualifyClick }) {
+export default function ContactList({ contacts, totalItems, currentPage, totalPages, onPageChange, itemsPerPage, onDisqualifyClick, onMarkAsOpenedClick }) {
   
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -31,7 +31,8 @@ export default function ContactList({ contacts, totalItems, currentPage, totalPa
           <ContactItem 
             key={contact._id || contact.id} 
             contact={contact} 
-            onDisqualifyClick={onDisqualifyClick} // Pass it down
+            onDisqualifyClick={onDisqualifyClick}
+            onMarkAsOpenedClick={onMarkAsOpenedClick}
           />
         ))}
       </div>

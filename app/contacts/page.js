@@ -137,6 +137,39 @@ export default function ContactsPage() {
     }
   };
 
+  const handleMarkAsOpened = async (contactToMark) => {
+    if (!contactToMark || !contactToMark._id) return;
+    console.log("Marking email as opened for contact:", contactToMark.first_name, contactToMark._id);
+    try {
+      const response = await fetch(`/api/contacts/${contactToMark._id}/mark-opened`, {
+        method: 'POST', // Using POST for this action
+        headers: { 'Content-Type': 'application/json' },
+        // No body needed if the timestamp is generated on the server
+        // body: JSON.stringify({ opened_at: new Date() }), // Or send timestamp from client
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to mark email as opened');
+      }
+      const result = await response.json();
+      console.log(result.message);
+      // Refresh contact list to show updated status (e.g., a visual cue for opened)
+      // Or update the specific contact in local state
+      setContactsData(prevData => ({
+        ...prevData,
+        items: prevData.items.map(c => 
+          c._id === contactToMark._id ? { ...c, last_email_opened_timestamp: result.opened_at, ...result.updatedContact } : c
+        )
+      }));
+      // fetchContacts(currentPage, filters); // Or re-fetch all
+      alert(`Email interaction marked as opened for ${contactToMark.first_name}.`);
+
+    } catch (err) {
+      console.error("Failed to mark email as opened:", err);
+      alert(`Error: ${err.message}`);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <header className="mb-10">
@@ -183,7 +216,7 @@ export default function ContactsPage() {
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>
               </div>
             </div>
-            <div className="relative lg:col-start-1"> {/* New filter for disqualification status */}
+            <div className="relative lg:col-start-1"> 
               <select
                 name="disqualificationStatus"
                 value={filters.disqualificationStatus || ''}
@@ -214,6 +247,7 @@ export default function ContactsPage() {
           onPageChange={handlePageChange}
           itemsPerPage={itemsPerPage}
           onDisqualifyClick={openDisqualifyModal}
+          onMarkAsOpenedClick={handleMarkAsOpened} // Pass the new handler
         />
       )}
        {!isLoading && !error && (!contactsData.items || contactsData.items.length === 0) && (
