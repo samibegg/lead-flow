@@ -5,8 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ContactList from '@/components/contacts/ContactList'; 
 import LoadingSpinner from '@/components/ui/LoadingSpinner'; 
 import DisqualifyModal from '@/components/contacts/DisqualifyModal';
-// useRouter is not currently used here, can be removed if not planned for other actions
-// import { useRouter } from 'next/navigation'; 
+// import { useRouter } from 'next/navigation'; // Not currently used, can be removed if not planned for other actions
 
 export default function ContactsPage() {
   const [contactsData, setContactsData] = useState({
@@ -23,11 +22,12 @@ export default function ContactsPage() {
     industry: '', 
     city: '',
     emailStatus: '', 
-    disqualificationStatus: '', // New filter: '' for All, 'qualified', 'disqualified'
+    disqualificationStatus: '', 
   }); 
-  const itemsPerPage = 10; 
-  // const router = useRouter(); 
+  const itemsPerPage = 25; // Default items per page
+  // const router = useRouter(); // Not currently used
 
+  // State for Disqualify Modal
   const [isDisqualifyModalOpen, setIsDisqualifyModalOpen] = useState(false);
   const [contactToDisqualify, setContactToDisqualify] = useState(null);
 
@@ -80,7 +80,6 @@ export default function ContactsPage() {
   const debouncedFetchContacts = useCallback(debounce(fetchContacts, 500), [fetchContacts]);
 
   useEffect(() => {
-    // Check if any filter has a non-empty value
     const activeFilterValues = Object.values(filters).some(value => value && value !== '');
     if (activeFilterValues) {
         debouncedFetchContacts(currentPage, filters);
@@ -102,6 +101,7 @@ export default function ContactsPage() {
     handleFilterChange({ [e.target.name]: e.target.value });
   };
 
+  // Functions for Disqualify Modal
   const openDisqualifyModal = (contact) => {
     setContactToDisqualify(contact);
     setIsDisqualifyModalOpen(true);
@@ -127,11 +127,13 @@ export default function ContactsPage() {
         throw new Error(result.message || 'Failed to update disqualification status');
       }
       
+      // Refresh contacts list to show updated status
       fetchContacts(currentPage, filters); 
       closeDisqualifyModal();
     } catch (err) {
       console.error('Failed to disqualify contact:', err);
-      alert(`Error: ${err.message}`);
+      // You might want to show an error message to the user here
+      alert(`Error: ${err.message}`); // Simple alert for now
     }
   };
 
@@ -181,8 +183,7 @@ export default function ContactsPage() {
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>
               </div>
             </div>
-            {/* New Filter for Disqualification Status */}
-            <div className="relative lg:col-start-1"> {/* Place it on a new row on large screens if needed */}
+            <div className="relative lg:col-start-1"> {/* New filter for disqualification status */}
               <select
                 name="disqualificationStatus"
                 value={filters.disqualificationStatus || ''}
