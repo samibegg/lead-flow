@@ -44,9 +44,6 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
 Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
 Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
 Join us for a jumpstart - Limited availability!\n
-Check out this 30 second video by our founder:
-<div><a href="https://www.loom.com/share/ed998da36fe24853a49c3d97504dd611">
-<img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/ed998da36fe24853a49c3d97504dd611-0877e04a289ee27d-full-play.gif"></a></div>\n
 Please let me know if you are interested - Thank You,\n\n
 {{user.name}}
 Principal AI Engineer
