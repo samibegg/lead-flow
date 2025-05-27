@@ -21,6 +21,7 @@ export async function GET(request) {
     const searchTerm = searchParams.get('searchTerm');
     const industry = searchParams.get('industry');
     const city = searchParams.get('city');
+    const emailStatus = searchParams.get('emailStatus'); // New filter
 
     const skip = (page - 1) * limit;
 
@@ -28,18 +29,20 @@ export async function GET(request) {
     const contactsCollection = db.collection('contacts'); 
 
     const query = {};
-    
+    const andConditions = []; // Use $and for combining multiple conditions cleanly
+
     // General search term (searches multiple fields)
     if (searchTerm) {
-      query.$or = [
-        { first_name: { $regex: searchTerm, $options: 'i' } },
-        { last_name: { $regex: searchTerm, $options: 'i' } },
-        { organization_name: { $regex: searchTerm, $options: 'i' } },
-        { email: { $regex: searchTerm, $options: 'i' } },
-        { title: { $regex: searchTerm, $options: 'i' } },
-        // Note: If industry and city are also meant to be part of general search, add them here.
-        // Otherwise, they are treated as separate, additive filters below.
-      ];
+      andConditions.push({
+        $or: [
+          { first_name: { $regex: searchTerm, $options: 'i' } },
+          { last_name: { $regex: searchTerm, $options: 'i' } },
+          { organization_name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } },
+          { title: { $regex: searchTerm, $options: 'i' } },
+          { address: { $regex: searchTerm, $options: 'i' } }, 
+        ]
+      });
     }
 
     // Specific field filters (additive to the general search if searchTerm is also present)
@@ -49,10 +52,24 @@ export async function GET(request) {
     if (city) {
       query.city = { $regex: city, $options: 'i' };
     }
-    // Add more specific filters here if needed, e.g., for state, title, etc.
-    // if (searchParams.get('state')) {
-    //   query.state = { $regex: searchParams.get('state'), $options: 'i' };
-    // }
+
+    if (emailStatus === 'contacted') {
+      // Checks if email_history array exists and is not empty
+      andConditions.push({ "email_history.0": { "$exists": true } }); 
+    } else if (emailStatus === 'not_contacted') {
+      // Checks if email_history array does not exist, is null, or is empty
+      andConditions.push({ 
+        "$or": [
+          { "email_history": { "$exists": false } },
+          { "email_history": null },
+          { "email_history": { "$size": 0 } }
+        ]
+      });
+    }
+    
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
+    }
 
 
     const contacts = await contactsCollection.find(query).skip(skip).limit(limit).toArray();

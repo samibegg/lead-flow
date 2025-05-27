@@ -1,12 +1,19 @@
 // components/contacts/ContactItem.js
 import React from 'react';
 import Link from 'next/link'; 
-import { Briefcase, Mail, MapPin as PinIcon, Link as LinkIconExternal, Building, ExternalLink as ExternalLinkIcon, Edit3, Facebook, Twitter } from 'lucide-react'; 
+import { 
+    Briefcase, Mail, MapPin as PinIcon, Link as LinkIconExternal, 
+    Building, ExternalLink as ExternalLinkIcon, Edit3, 
+    Facebook, Twitter, CheckCircle, AlertCircle, XOctagon 
+} from 'lucide-react'; 
+// Assuming you have an SVG for LinkedIn or you can use a generic Link icon
+// For a proper LinkedIn icon, you might use a library or an SVG directly.
+// For simplicity, I'll use the LinkIconExternal for LinkedIn if a specific LinkedIn icon isn't readily available from lucide-react this way.
+// Or use the SVG path as before.
 
-export default function ContactItem({ contact }) {
+export default function ContactItem({ contact, onDisqualifyClick }) { 
   if (!contact) return null;
 
-  
   const name = `${contact.first_name || ''} ${contact.last_name || ''}`.trim();
   const title = contact.title || 'N/A';
   const company = contact.organization_name || 'N/A';
@@ -14,23 +21,65 @@ export default function ContactItem({ contact }) {
   const fullAddress = contact.address || 'N/A'; 
   const industry = contact.industry || 'N/A';
 
+  const hasBeenEmailed = contact.email_history && contact.email_history.length > 0;
+  const isDisqualified = contact.disqualification && contact.disqualification.reasons && contact.disqualification.reasons.length > 0;
+  const disqualificationDisplayReason = isDisqualified 
+    ? contact.disqualification.reasons.map(r => r.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(', ') + 
+      (contact.disqualification.other_reason_text ? ` (${contact.disqualification.other_reason_text})` : '') 
+    : '';
+
+  let cardBaseClasses = `
+    bg-surface-light dark:bg-surface-dark 
+    shadow-lg dark:shadow-slate-700/50 
+    rounded-xl p-6 flex flex-col justify-between 
+    hover:shadow-xl dark:hover:shadow-slate-600/60 
+    transition-all duration-300 ease-in-out 
+    border
+  `;
+  
+  if (isDisqualified) {
+    cardBaseClasses += " border-orange-400 dark:border-orange-600 bg-orange-50/30 dark:bg-orange-900/20 opacity-70";
+  } else if (hasBeenEmailed) {
+    cardBaseClasses += " border-green-300 dark:border-green-700/80 bg-green-50/30 dark:bg-green-900/20";
+  } else {
+    cardBaseClasses += " border-border-light dark:border-border-dark";
+  }
+
   return (
-    <div className="bg-surface-light dark:bg-surface-dark shadow-lg dark:shadow-slate-700/50 rounded-xl p-6 flex flex-col justify-between hover:shadow-xl dark:hover:shadow-slate-600/60 transition-shadow duration-300 ease-in-out border border-border-light dark:border-border-dark">
+    <div className={cardBaseClasses}>
       <div>
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-primary dark:text-primary-dark">{name || 'Unnamed Contact'}</h2>
+            <h2 className={`text-xl font-semibold ${isDisqualified ? 'text-orange-700 dark:text-orange-400 line-through' : (hasBeenEmailed ? 'text-green-700 dark:text-green-400' : 'text-primary dark:text-primary-dark')}`}>
+              {name || 'Unnamed Contact'}
+            </h2>
             <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark flex items-center mt-1">
               <Briefcase size={14} className="mr-1.5 text-slate-400 dark:text-slate-500" />
               {title}
             </p>
+            {isDisqualified && (
+              <p className="mt-1 text-xs text-orange-600 dark:text-orange-500 font-medium break-words" title={disqualificationDisplayReason}>
+                Disqualified: {disqualificationDisplayReason.substring(0,40)}{disqualificationDisplayReason.length > 40 ? '...' : ''}
+              </p>
+            )}
           </div>
-          <Link href={`/contacts/${contact._id || contact.id}/edit`} className="p-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-            <Edit3 size={18} />
-          </Link>
+          <div className="flex flex-col items-end space-y-1 shrink-0 ml-2">
+            {!isDisqualified && (
+                <Link href={`/contacts/${contact._id || contact.id}/edit`} className="p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-dark transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <Edit3 size={16} />
+                </Link>
+            )}
+            {hasBeenEmailed && !isDisqualified && (
+              <CheckCircle size={16} className="text-green-500 dark:text-green-400" title="Emailed" />
+            )}
+            {!hasBeenEmailed && !isDisqualified && (
+              <AlertCircle size={16} className="text-amber-500 dark:text-amber-400" title="Not Emailed Yet" />
+            )}
+          </div>
         </div>
 
-        <div className="space-y-3 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-5">
+        {/* Details Section - Only show if not disqualified, or show minimal info */}
+        <div className={`space-y-3 text-sm text-text-secondary-light dark:text-text-secondary-dark mb-5 ${isDisqualified ? 'opacity-60' : ''}`}>
           <p className="flex items-center">
             <Building size={14} className="mr-2 text-slate-400 dark:text-slate-500 flex-shrink-0" />
             Works at <span className="font-medium ml-1 text-text-primary-light dark:text-text-primary-dark">{company}</span>
@@ -53,6 +102,7 @@ export default function ContactItem({ contact }) {
           </p>
           {contact.linkedin_url && (
             <p className="flex items-center">
+              {/* Using a simple SVG for LinkedIn as before */}
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="mr-2 text-slate-400 dark:text-slate-500 flex-shrink-0"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
               <a href={contact.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:underline truncate">
                 LinkedIn Profile
@@ -83,10 +133,22 @@ export default function ContactItem({ contact }) {
         </div>
       </div>
 
-      <div className="mt-auto pt-4 border-t border-border-light dark:border-border-dark">
-        <Link href={`/email-composer/${contact._id || contact.id}`} className="text-sm text-primary dark:text-primary-dark hover:text-primary-hover-light dark:hover:text-primary-hover-dark font-medium flex items-center justify-center py-2.5 px-3 bg-indigo-50 dark:bg-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 rounded-md transition-colors">
-          Compose Email <ExternalLinkIcon size={14} className="ml-1.5" />
-        </Link>
+      <div className="mt-auto pt-4 border-t border-border-light dark:border-border-dark space-y-2">
+        {!isDisqualified && (
+          <Link href={`/email-composer/${contact._id || contact.id}`} className="text-sm text-primary dark:text-primary-dark hover:text-primary-hover-light dark:hover:text-primary-hover-dark font-medium flex items-center justify-center py-2.5 px-3 bg-indigo-50 dark:bg-indigo-500/20 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 rounded-md transition-colors">
+            Compose Email <ExternalLinkIcon size={14} className="ml-1.5" />
+          </Link>
+        )}
+        <button
+          onClick={() => onDisqualifyClick(contact)}
+          className={`w-full text-sm font-medium flex items-center justify-center py-2.5 px-3 rounded-md transition-colors
+            ${isDisqualified 
+              ? 'bg-yellow-500/20 dark:bg-yellow-600/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/30 dark:hover:bg-yellow-600/40' 
+              : 'bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/30'}`}
+        >
+          <XOctagon size={14} className="mr-1.5" />
+          {isDisqualified ? 'Update Disqualification' : 'Disqualify'}
+        </button>
       </div>
     </div>
   );

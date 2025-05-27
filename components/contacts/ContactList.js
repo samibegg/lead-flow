@@ -2,7 +2,8 @@
 import React from 'react';
 import ContactItem from './ContactItem';
 
-export default function ContactList({ contacts, totalItems, currentPage, totalPages, onPageChange, itemsPerPage }) {
+// Add onDisqualifyClick to props
+export default function ContactList({ contacts, totalItems, currentPage, totalPages, onPageChange, itemsPerPage, onDisqualifyClick }) {
   
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -17,7 +18,6 @@ export default function ContactList({ contacts, totalItems, currentPage, totalPa
   };
 
   if (!contacts || contacts.length === 0) {
-    
     return null; 
   }
 
@@ -28,7 +28,11 @@ export default function ContactList({ contacts, totalItems, currentPage, totalPa
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {contacts.map(contact => (
-          <ContactItem key={contact._id || contact.id} contact={contact} />
+          <ContactItem 
+            key={contact._id || contact.id} 
+            contact={contact} 
+            onDisqualifyClick={onDisqualifyClick} // Pass it down
+          />
         ))}
       </div>
 

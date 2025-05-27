@@ -1,20 +1,20 @@
 // app/api/contacts/[id]/route.js
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb'; 
-import { connectToDatabase } from '@/lib/mongodb'; // Using alias
+import { connectToDatabase } from '@/lib/mongodb'; 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from '@/lib/authOptions'; // Using alias
+import { authOptions } from '@/lib/authOptions'; 
 
-// GET a single contact by ID
+// GET a single contact by ID (remains the same)
 export async function GET(request, context) { 
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
   
-  // The `params` object is available on the `context` argument
-  const resolvedParams = await context.params; 
-  const contactId = resolvedParams.id;
+  const { params } = context; 
+  const awaitedParams = await params; 
+  const contactId = awaitedParams.id; 
 
   if (!contactId || !ObjectId.isValid(contactId)) {
     return NextResponse.json({ message: 'Invalid contact ID' }, { status: 400 });
@@ -42,8 +42,9 @@ export async function PUT(request, context) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const resolvedParams = await context.params;
-  const contactId = resolvedParams.id;
+  const { params } = context; 
+  const awaitedParams = await params; 
+  const contactId = awaitedParams.id; 
 
   if (!contactId || !ObjectId.isValid(contactId)) {
     return NextResponse.json({ message: 'Invalid contact ID' }, { status: 400 });
@@ -52,19 +53,35 @@ export async function PUT(request, context) {
   try {
     const updates = await request.json();
     
+    // Prevent _id from being updated if it's part of the payload
     if (updates._id) delete updates._id; 
 
+    // If 'disqualification' is in updates, handle it
+    // If it's an object with an empty 'reasons' array or null timestamp, it means "re-qualify"
+    if ('disqualification' in updates) {
+      if (updates.disqualification === null || (Array.isArray(updates.disqualification.reasons) && updates.disqualification.reasons.length === 0 && !updates.disqualification.other_reason_text) ) {
+        // If requalifying, set disqualification to null or remove the field
+        updates.disqualification = null; // Or use $unset: { disqualification: "" } in $set
+      } else if (updates.disqualification && Array.isArray(updates.disqualification.reasons)) {
+        // If disqualifying or updating disqualification
+        updates.disqualification.timestamp = new Date();
+        // Ensure other_reason_text is cleared if 'other' is not a selected reason
+        if (!updates.disqualification.reasons.includes('other')) {
+          updates.disqualification.other_reason_text = '';
+        }
+      }
+    }
+    
     updates.updatedAt = new Date(); 
 
     const { db } = await connectToDatabase();
     const result = await db.collection('contacts').findOneAndUpdate(
       { _id: new ObjectId(contactId) },
-      { $set: updates },
+      { $set: updates }, // Using $set to update specific fields
       { returnDocument: 'after' } 
     );
     
     const updatedContact = result.value ? result.value : result;
-
 
     if (!updatedContact) { 
       return NextResponse.json({ message: 'Contact not found or no changes made' }, { status: 404 });
@@ -77,4 +94,3 @@ export async function PUT(request, context) {
     return NextResponse.json({ message: 'Failed to update contact', error: error.message }, { status: 500 });
   }
 }
-
