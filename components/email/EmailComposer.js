@@ -43,8 +43,11 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
         body: `Hi {{contact.first_name}}, hope you are well.\n
 Forge Mission is enabling firms like {{contact.organization_name}} start operationalizing with AI FOR FREE!
 Is your team already up and running with agentic workflows, RAG and custom model training pipelines?
-Limited availability!\n
-Reply if interested - Thank You,\n\n
+Join us for a jumpstart - Limited availability!\n
+Check out this 30 second video by our founder:
+<div><a href="https://www.loom.com/share/ed998da36fe24853a49c3d97504dd611">
+<img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/ed998da36fe24853a49c3d97504dd611-0877e04a289ee27d-full-play.gif"></a></div>\n
+Please let me know if you are interested - Thank You,\n\n
 {{user.name}}
 Principal AI Engineer
 Forge Mission\n` 
@@ -52,8 +55,8 @@ Forge Mission\n`
     { id: 'ai-followup', name: 'AI Follow-up', 
         subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
         body: `{{contact.first_name}}, just making sure you didn't miss out.\n
-Following up to see if {{contact.organization_name}} would like free AI training starting this month.
-Forge Mission enables teams like yours to begin implementing agentic workflows, RAG and custom model training pipelines for your customers.
+Following up to see if {{contact.organization_name}} would like to join us for free AI training starting this month.
+Forge Mission enables teams like yours to begin implementing agentic workflows, RAG and custom model training pipelines for your projects.
 The live virtual sessions are filling up now!\n
 Thank You,\n\n
 {{user.name}}
