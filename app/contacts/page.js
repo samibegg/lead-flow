@@ -4,8 +4,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ContactList from '@/components/contacts/ContactList'; 
 import LoadingSpinner from '@/components/ui/LoadingSpinner'; 
-import DisqualifyModal from '@/components/contacts/DisqualifyModal'; // Import the new modal
-import { useRouter } from 'next/navigation'; // For potential refresh or navigation
+import DisqualifyModal from '@/components/contacts/DisqualifyModal';
+// useRouter is not currently used here, can be removed if not planned for other actions
+// import { useRouter } from 'next/navigation'; 
 
 export default function ContactsPage() {
   const [contactsData, setContactsData] = useState({
@@ -21,13 +22,12 @@ export default function ContactsPage() {
     searchTerm: '', 
     industry: '', 
     city: '',
-    emailStatus: '',
-    // disqualificationStatus: '', // We will add this filter later
+    emailStatus: '', 
+    disqualificationStatus: '', // New filter: '' for All, 'qualified', 'disqualified'
   }); 
   const itemsPerPage = 10; 
-  const router = useRouter(); // For refreshing data
+  // const router = useRouter(); 
 
-  // State for Disqualify Modal
   const [isDisqualifyModalOpen, setIsDisqualifyModalOpen] = useState(false);
   const [contactToDisqualify, setContactToDisqualify] = useState(null);
 
@@ -42,7 +42,6 @@ export default function ContactsPage() {
   };
   
   const fetchContacts = useCallback(async (page, currentFilters) => {
-    // console.log("Fetching contacts with filters:", currentFilters); // For debugging
     setIsLoading(true);
     setError(null);
     try {
@@ -81,7 +80,8 @@ export default function ContactsPage() {
   const debouncedFetchContacts = useCallback(debounce(fetchContacts, 500), [fetchContacts]);
 
   useEffect(() => {
-    const activeFilterValues = Object.values(filters).some(value => !!value);
+    // Check if any filter has a non-empty value
+    const activeFilterValues = Object.values(filters).some(value => value && value !== '');
     if (activeFilterValues) {
         debouncedFetchContacts(currentPage, filters);
     } else {
@@ -102,7 +102,6 @@ export default function ContactsPage() {
     handleFilterChange({ [e.target.name]: e.target.value });
   };
 
-  // Functions for Disqualify Modal
   const openDisqualifyModal = (contact) => {
     setContactToDisqualify(contact);
     setIsDisqualifyModalOpen(true);
@@ -120,7 +119,7 @@ export default function ContactsPage() {
       const response = await fetch(`/api/contacts/${contactToDisqualify._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ disqualification: disqualificationData }), // Send disqualification data under a specific key
+        body: JSON.stringify({ disqualification: disqualificationData }), 
       });
       
       const result = await response.json();
@@ -128,18 +127,10 @@ export default function ContactsPage() {
         throw new Error(result.message || 'Failed to update disqualification status');
       }
       
-      // Refresh contacts list to show updated status
       fetchContacts(currentPage, filters); 
-      // Or update the specific contact in the local state for immediate UI feedback
-      // setContactsData(prev => ({
-      //   ...prev,
-      //   items: prev.items.map(c => c._id === contactToDisqualify._id ? result.updatedContact : c)
-      // }));
-
       closeDisqualifyModal();
     } catch (err) {
       console.error('Failed to disqualify contact:', err);
-      // You might want to show an error message to the user here
       alert(`Error: ${err.message}`);
     }
   };
@@ -151,7 +142,6 @@ export default function ContactsPage() {
         <div className="mt-6 p-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-border-light dark:border-border-dark">
           <h3 className="text-xl font-semibold mb-4 text-text-primary-light dark:text-text-primary-dark">Filter Contacts</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
-            {/* Existing filters... */}
             <input
               type="text"
               name="searchTerm" 
@@ -191,6 +181,22 @@ export default function ContactsPage() {
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>
               </div>
             </div>
+            {/* New Filter for Disqualification Status */}
+            <div className="relative lg:col-start-1"> {/* Place it on a new row on large screens if needed */}
+              <select
+                name="disqualificationStatus"
+                value={filters.disqualificationStatus || ''}
+                onChange={onFilterInputChange}
+                className="w-full px-4 py-2.5 pr-10 border border-border-light dark:border-border-dark bg-white dark:bg-slate-700 text-text-primary-light dark:text-text-primary-dark rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark transition-shadow appearance-none"
+              >
+                <option value="">All Qualification Status</option>
+                <option value="qualified">Qualified</option>
+                <option value="disqualified">Disqualified</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary-light dark:text-text-secondary-dark">
+                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -206,7 +212,7 @@ export default function ContactsPage() {
           totalPages={contactsData.totalPages}
           onPageChange={handlePageChange}
           itemsPerPage={itemsPerPage}
-          onDisqualifyClick={openDisqualifyModal} // Pass down the handler
+          onDisqualifyClick={openDisqualifyModal}
         />
       )}
        {!isLoading && !error && (!contactsData.items || contactsData.items.length === 0) && (

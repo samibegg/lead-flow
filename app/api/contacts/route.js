@@ -1,10 +1,10 @@
 // app/api/contacts/route.js
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '../../../lib/mongodb'; // Adjust path
+import { connectToDatabase } from '@/lib/mongodb'; 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from '../../../lib/authOptions'; // Corrected import path
+import { authOptions } from '@/lib/authOptions'; 
 
-const ITEMS_PER_PAGE = 10; // Default items per page
+const ITEMS_PER_PAGE = 10; 
 
 export async function GET(request) {
   const session = await getServerSession(authOptions);
@@ -17,11 +17,11 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || ITEMS_PER_PAGE.toString(), 10);
     
-    // Get filter parameters
     const searchTerm = searchParams.get('searchTerm');
     const industry = searchParams.get('industry');
     const city = searchParams.get('city');
-    const emailStatus = searchParams.get('emailStatus'); // New filter
+    const emailStatus = searchParams.get('emailStatus');
+    const disqualificationStatus = searchParams.get('disqualificationStatus'); // New filter
 
     const skip = (page - 1) * limit;
 
@@ -29,9 +29,8 @@ export async function GET(request) {
     const contactsCollection = db.collection('contacts'); 
 
     const query = {};
-    const andConditions = []; // Use $and for combining multiple conditions cleanly
-
-    // General search term (searches multiple fields)
+    const andConditions = []; 
+    
     if (searchTerm) {
       andConditions.push({
         $or: [
@@ -45,19 +44,16 @@ export async function GET(request) {
       });
     }
 
-    // Specific field filters (additive to the general search if searchTerm is also present)
     if (industry) {
-      query.industry = { $regex: industry, $options: 'i' };
+      andConditions.push({ industry: { $regex: industry, $options: 'i' } });
     }
     if (city) {
-      query.city = { $regex: city, $options: 'i' };
+      andConditions.push({ city: { $regex: city, $options: 'i' } });
     }
 
     if (emailStatus === 'contacted') {
-      // Checks if email_history array exists and is not empty
       andConditions.push({ "email_history.0": { "$exists": true } }); 
     } else if (emailStatus === 'not_contacted') {
-      // Checks if email_history array does not exist, is null, or is empty
       andConditions.push({ 
         "$or": [
           { "email_history": { "$exists": false } },
@@ -66,11 +62,30 @@ export async function GET(request) {
         ]
       });
     }
+
+    // Handle disqualificationStatus filter
+    if (disqualificationStatus === 'disqualified') {
+      // Contact is disqualified if 'disqualification' field exists, is not null, 
+      // and the 'reasons' array within it is not empty.
+      andConditions.push({ 
+        "disqualification": { "$exists": true, "$ne": null },
+        "disqualification.reasons.0": { "$exists": true } // Check if reasons array has at least one element
+      });
+    } else if (disqualificationStatus === 'qualified') {
+      // Contact is qualified if 'disqualification' field does not exist, is null, 
+      // or the 'reasons' array is empty.
+      andConditions.push({
+        "$or": [
+          { "disqualification": { "$exists": false } },
+          { "disqualification": null },
+          { "disqualification.reasons": { "$exists": true, "$size": 0 } } 
+        ]
+      });
+    }
     
     if (andConditions.length > 0) {
       query.$and = andConditions;
     }
-
 
     const contacts = await contactsCollection.find(query).skip(skip).limit(limit).toArray();
     const totalContacts = await contactsCollection.countDocuments(query);
@@ -87,4 +102,3 @@ export async function GET(request) {
     return NextResponse.json({ message: 'Failed to fetch contacts', error: error.message }, { status: 500 });
   }
 }
-
