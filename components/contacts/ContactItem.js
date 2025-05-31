@@ -41,14 +41,14 @@ export default function ContactItem({ contact, onDisqualifyClick, onMarkAsOpened
   if (isDisqualified) {
     cardBaseClasses += " border-orange-400 dark:border-orange-600 bg-orange-50/30 dark:bg-orange-900/20 opacity-70";
     titleColorClass = 'text-orange-700 dark:text-orange-400 line-through';
+  } else if (lastEmailOpenedTimestamp && lastEmailClickedTimestamp) {
+    // Style for "opened and clicked"
+    cardBaseClasses += " border-red-300 dark:border-red-700/80 bg-red-50/30 dark:bg-red-900/20";
+    titleColorClass = 'text-red-700 dark:text-red-400';
   } else if (lastEmailOpenedTimestamp) {
     // Style for "emailed and opened"
     cardBaseClasses += " border-sky-300 dark:border-sky-700/80 bg-sky-50/30 dark:bg-sky-900/20";
     titleColorClass = 'text-sky-700 dark:text-sky-400';
-  } else if (lastEmailClickedTimestamp) {
-    // Style for "opened and clicked"
-    cardBaseClasses += " border-indigo-300 dark:border-indigo-700/80 bg-sky-50/30 dark:bg-indigo-900/20";
-    titleColorClass = 'text-indigo-700 dark:text-indigo-400';
   } else if (hasBeenEmailed) {
     // Style for "emailed but not yet marked opened"
     cardBaseClasses += " border-green-300 dark:border-green-700/80 bg-green-50/30 dark:bg-green-900/20";
