@@ -58,22 +58,37 @@ export async function POST(request) {
 
       const { db } = await connectToDatabase();
       
-      // Find the contact and update the specific email_history entry
-      // This query assumes mailgun_id in email_history matches the messageId from the webhook
-      const updateResult = await db.collection('contacts').updateOne(
-        { 
-          "email": recipientEmail, // Find contact by email
-          "email_history.mailgun_id": messageId // Match the specific email
-        },
-        { 
-          $set: { 
-            "email_history.$.opened_at": timestamp, // Update the matched email_history element
-            "email_history.$.status": eventData.event, // e.g., 'opened' or 'clicked'
-            "last_email_opened_timestamp": timestamp, // Also update the top-level field
-            "updatedAt": new Date()
+      if (eventData.event === 'opened') { 
+        const updateResult = await db.collection('contacts').updateOne(
+          { 
+            "email": recipientEmail, // Find contact by email
+            "email_history.mailgun_id": messageId // Match the specific email
+          },
+          { 
+            $set: { 
+              "email_history.$.opened_at": timestamp, // Update the matched email_history element
+              "email_history.$.status": eventData.event, // e.g., 'opened' or 'clicked'
+              "last_email_opened_timestamp": timestamp, // Also update the top-level field
+              "updatedAt": new Date()
+            }
           }
-        }
-      );
+        );
+      } else if (eventData.event === 'clicked') {
+        const updateResult = await db.collection('contacts').updateOne(
+          { 
+            "email": recipientEmail, // Find contact by email
+            "email_history.mailgun_id": messageId // Match the specific email
+          },
+          { 
+            $set: { 
+              "email_history.$.clicked_at": timestamp, // Update the matched email_history element
+              "email_history.$.status": eventData.event, // e.g., 'opened' or 'clicked'
+              "last_email_clicked_timestamp": timestamp, // Also update the top-level field
+              "updatedAt": new Date()
+            }
+          }
+        );
+      }
 
       if (updateResult.matchedCount === 0) {
         console.warn(`Mailgun Webhook: No matching contact/email found for recipient ${recipientEmail} and messageId ${messageId}`);

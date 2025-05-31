@@ -38,7 +38,20 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
 
   const emailTemplates = [
     { id: 'blank', name: '-- No Template --', subject: '', body: `\n\nBest,\n{{user.name}}` }, // Default blank with signature
-    { id: 'ai-intro', name: 'AI Intro', 
+    { id: 'ai-intro', name: 'AI Intro - discuss', 
+      subject: `Hi {{contact.first_name}}, Im interested in discussing {{contact.organization_name}}`, 
+      body: `Hi {{contact.first_name}}, hope you are well.\n
+Impressed by your success in the {{contact.industry}} space. I've been working with similar teams to establish their AI execution strategy... this may be of interest to you.\n 
+Forge Mission is offering a <b>free live</b> 60-min webcall to kickstart your AI Operationalization; here's the 10-second intro:
+<a href="https://www.forgemission.com/ai/services" target="_blank" rel="noopener noreferrer">Forge Mission AI Services</a>\n
+Have you already started implementing agentic workflows, RAG and custom model training pipelines?
+We can assist - Let me know!\n
+Thank You,
+{{user.name}}
+Principal AI Engineer
+Forge Mission\n` 
+    },  
+  { id: 'ai-intro', name: 'AI Intro - training', 
         subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
         body: `Hi {{contact.first_name}}, hope you are well.\n
 Impressed by your success in the {{contact.industry}} space. Does your team already have an AI execution strategy in place?\n

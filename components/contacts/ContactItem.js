@@ -19,7 +19,8 @@ export default function ContactItem({ contact, onDisqualifyClick, onMarkAsOpened
 
   const hasBeenEmailed = contact.email_history && contact.email_history.length > 0;
   const isDisqualified = contact.disqualification && contact.disqualification.reasons && contact.disqualification.reasons.length > 0;
-  const lastEmailOpenedTimestamp = contact.last_email_opened_timestamp; // Get the new field
+  const lastEmailOpenedTimestamp = contact.last_email_opened_timestamp; 
+  const lastEmailClickedTimestamp = contact.last_email_clicked_timestamp; 
 
   const disqualificationDisplayReason = isDisqualified 
     ? contact.disqualification.reasons.map(r => r.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(', ') + 
@@ -41,9 +42,13 @@ export default function ContactItem({ contact, onDisqualifyClick, onMarkAsOpened
     cardBaseClasses += " border-orange-400 dark:border-orange-600 bg-orange-50/30 dark:bg-orange-900/20 opacity-70";
     titleColorClass = 'text-orange-700 dark:text-orange-400 line-through';
   } else if (lastEmailOpenedTimestamp) {
-    // New style for "emailed and opened"
+    // Style for "emailed and opened"
     cardBaseClasses += " border-sky-300 dark:border-sky-700/80 bg-sky-50/30 dark:bg-sky-900/20";
     titleColorClass = 'text-sky-700 dark:text-sky-400';
+  } else if (lastEmailClickedTimestamp) {
+    // Style for "opened and clicked"
+    cardBaseClasses += " border-indigo-300 dark:border-indigo-700/80 bg-sky-50/30 dark:bg-indigo-900/20";
+    titleColorClass = 'text-indigo-700 dark:text-indigo-400';
   } else if (hasBeenEmailed) {
     // Style for "emailed but not yet marked opened"
     cardBaseClasses += " border-green-300 dark:border-green-700/80 bg-green-50/30 dark:bg-green-900/20";
