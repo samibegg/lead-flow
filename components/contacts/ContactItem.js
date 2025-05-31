@@ -85,6 +85,9 @@ export default function ContactItem({ contact, onDisqualifyClick, onMarkAsOpened
             {lastEmailOpenedTimestamp && !isDisqualified && (
                 <MailOpen size={16} className="text-sky-500 dark:text-sky-400" title={`Last email opened: ${new Date(lastEmailOpenedTimestamp).toLocaleDateString()}`} />
             )}
+            {lastEmailClickedTimestamp && !isDisqualified && (
+                <MailOpen size={16} className="text-red-500 dark:text-red-400" title={`Last email clicked: ${new Date(lastEmailClickedTimestamp).toLocaleDateString()}`} />
+            )}
             {hasBeenEmailed && !lastEmailOpenedTimestamp && !isDisqualified && (
               <CheckCircle size={16} className="text-green-500 dark:text-green-400" title="Emailed (Pending Open)" />
             )}
@@ -173,6 +176,12 @@ export default function ContactItem({ contact, onDisqualifyClick, onMarkAsOpened
             <div className="text-xs text-sky-600 dark:text-sky-400 flex items-center justify-center py-2 bg-sky-50/50 dark:bg-sky-900/30 rounded-md">
                 <MailOpen size={14} className="mr-1.5" />
                 Last email opened: {new Date(lastEmailOpenedTimestamp).toLocaleDateString()}
+            </div>
+        )}
+        {lastEmailClickedTimestamp && !isDisqualified && (
+            <div className="text-xs text-red-600 dark:text-red-400 flex items-center justify-center py-2 bg-red-50/50 dark:bg-red-900/30 rounded-md">
+                <MailOpen size={14} className="mr-1.5" />
+                Last email clicked: {new Date(lastEmailClickedTimestamp).toLocaleDateString()}
             </div>
         )}
         <button
