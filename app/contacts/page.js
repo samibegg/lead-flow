@@ -23,6 +23,7 @@ export default function ContactsPage() {
     emailStatus: '', 
     disqualificationStatus: '',
     openedEmailStatus: '', // New filter: '', 'opened', 'not_opened_sent'
+    clickedEmailStatus: '', // New filter: '', 'clicked', 'not_clicked_opened'
   }); 
   const itemsPerPage = 25; 
 
@@ -221,6 +222,21 @@ export default function ContactsPage() {
                 <option value="">Any Open Status</option>
                 <option value="opened">Email Opened</option>
                 <option value="not_opened_sent">Emailed, Not Opened</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary-light dark:text-text-secondary-dark">
+                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>
+              </div>
+            </div>
+            <div className="relative">
+              <select
+                name="clickedEmailStatus"
+                value={filters.clickedEmailStatus || ''}
+                onChange={onFilterInputChange}
+                className="w-full px-4 py-2.5 pr-10 border border-border-light dark:border-border-dark bg-white dark:bg-slate-700 text-text-primary-light dark:text-text-primary-dark rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark transition-shadow appearance-none"
+              >
+                <option value="">Any Clicked Status</option>
+                <option value="clicked">Email Clicked</option>
+                <option value="not_clicked_opened">Emailed, Not Clicked</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary-light dark:text-text-secondary-dark">
                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.141-.446 1.574 0 .436.445.408 1.197 0 1.615-.406.418-4.695 4.502-4.695 4.502a1.095 1.095 0 0 1-1.576 0S5.922 9.581 5.516 9.163c-.409-.418-.436-1.17 0-1.615z"/></svg>

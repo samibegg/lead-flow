@@ -23,6 +23,7 @@ export async function GET(request) {
     const emailStatus = searchParams.get('emailStatus');
     const disqualificationStatus = searchParams.get('disqualificationStatus');
     const openedEmailStatus = searchParams.get('openedEmailStatus'); // New filter
+    const clickedEmailStatus = searchParams.get('clickedEmailStatus'); // New filter
 
     const skip = (page - 1) * limit;
 
@@ -90,6 +91,18 @@ export async function GET(request) {
                 { "last_email_opened_timestamp": null }
             ]
         });
+    }
+
+    if (clickedEmailStatus === 'clicked') {
+      andConditions.push({ "last_email_clicked_timestamp": { "$exists": true, "$ne": null } });
+    } else if (clickedEmailStatus === 'not_clicked_opened') {
+      andConditions.push({
+          "email_history.0": { "$exists": true }, // Must have been emailed
+          "$or": [ // And not marked as clicked
+              { "last_email_clicked_timestamp": { "$exists": false } },
+              { "last_email_clicked_timestamp": null }
+          ]
+      });
     }
     
     if (andConditions.length > 0) {
