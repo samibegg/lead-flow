@@ -12,7 +12,8 @@ const senderEmails = [
   "aaron.adams@mail.forgemission.com",
   "sara.madison@mail.forgemission.com",
   "allie.jackson@mail.forgemission.com",
-  "caitlyn.thomas@mail.forgemission.com"
+  "caitlyn.thomas@mail.forgemission.com",
+  "sami.begg@mail.forgemission.com",
 ];
 
 // Helper function to extract a display name from an email
