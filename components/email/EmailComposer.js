@@ -39,17 +39,17 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
 
   const emailTemplates = [
     { id: 'blank', name: '-- No Template --', subject: '', body: `\n\nBest,\n{{user.name}}` }, // Default blank with signature
-    { id: 'ai-intro', name: 'AI Intro - discuss', 
-      subject: `Hi {{contact.first_name}}, Im interested in discussing {{contact.organization_name}}`, 
-      body: `Hi {{contact.first_name}}, hope you are well.\n
-Impressed by your success in the {{contact.industry}} space. I've been working with similar teams to establish their AI execution strategy... this may be of interest to you.\n 
-Forge Mission is offering a <b>free live</b> 60-min webcall to kickstart your AI Operationalization; here's the 10-second intro:
-<a href="https://www.forgemission.com/ai/services" target="_blank" rel="noopener noreferrer">Forge Mission AI Services</a>\n
-Have you already started implementing agentic workflows, RAG and custom model training pipelines?
-We can assist - Let me know!\n
-Thank You,
+    { id: 'ai-intro', name: 'AI Intro - non tech leader', 
+      subject: `Serious improvements using AI for {{contact.organization_name}}`, 
+      body: `Hey {{contact.first_name}}, hope you are well.\n
+Very impressed by your success with {{contact.industry}}. I've been working in IT modernization leveraging AI and wanted to run something by you.\n
+My team has had some recent success helping IT services firms bring agentic automation, RAG and custom LLMs into their own operations within days, and I believe we can help you as well. We saved a tech consulting firm in VA $2.5M annualized by automating workflows with AI agents. And this took days to implement.\n
+We did similar AI operationalization for a cloud transformation company in FL for their proposal and BD teams, and they saw a significant uptick in new business the following quarter as a result. I know this is completely out of the blue, but I went thru {{contact.organization_website_url}} and based on my understanding, I'm fairly confident we could help you in a similar manner.\n
+Just wanted to see if there was interest. {{contact.organization_name}} is one of the first firms I came across when looking into it. Would this be of value to you at all? Are you open to a 20 minute chat to see if we could identify a potential fit?\n
+Reply with your thougts when you have a moment?
+Thanks,
 {{user.name}}
-Principal AI Engineer
+Principal Engineer
 Forge Mission\n` 
     },  
   { id: 'ai-intro', name: 'AI Intro - training', 
@@ -94,6 +94,7 @@ Forge Mission\n`
       processedContent = processedContent.replace(/{{contact\.last_name}}/g, contactData.last_name || '');
       processedContent = processedContent.replace(/{{contact\.organization_name}}/g, contactData.organization_name || '');
       processedContent = processedContent.replace(/{{contact\.industry}}/g, contactData.industry || '');
+      processedContent = processedContent.replace(/{{contact\.organization_website_url}}/g, contactData.organization_website_url.replace(/^(https?:\/\/)?(www\.)?/, '') || '');
     }
     if (userData) {
       processedContent = processedContent.replace(/{{user\.name}}/g, userData.name);
