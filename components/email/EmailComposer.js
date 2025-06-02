@@ -44,9 +44,9 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
       body: `Hey {{contact.first_name}}, hope you are well.\n
 Very impressed by your success with {{contact.industry}}. I've been working in IT modernization leveraging AI and wanted to run something by you.\n
 My team has had some recent success helping IT services firms bring agentic automation, RAG and custom LLMs into their own operations within days, and I believe we can help you as well. We saved a tech consulting firm in VA $2.5M annualized by automating workflows with AI agents. And this took days to implement.\n
-We did similar AI operationalization for a cloud transformation company in FL for their proposal and BD teams, and they saw a significant uptick in new business the following quarter as a result. I know this is completely out of the blue, but I went thru {{contact.organization_website_url}} and based on my understanding, I'm fairly confident we could help you in a similar manner.\n
+We did similar AI operationalization for a cloud transformation company in FL for their proposal and BD teams, and they saw a significant uptick in new business the following quarter as a result. I know this is completely out of the blue, but I went through {{contact.organization_website_url}} and based on my understanding, I'm fairly confident we could help you in a similar manner.\n
 Just wanted to see if there was interest. {{contact.organization_name}} is one of the first firms I came across when looking into it. Would this be of value to you at all? Are you open to a 20 minute chat to see if we could identify a potential fit?\n
-Reply with your thougts when you have a moment?
+Reply with your thoughts when you have a moment?
 Thanks,
 {{user.name}}
 Principal Engineer
