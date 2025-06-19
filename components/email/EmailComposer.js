@@ -8,12 +8,12 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Predefined list of "From" email addresses
 const senderEmails = [
-  "Alexandra Hamilton <alexandra.hamilton@mail.abc.com>",
-  "Aaron Adams <aaron.adams@mail.abc.com>",
-  "Sara Madison <sara.madison@mail.abc.com>",
-  "Allie Jackson <allie.jackson@mail.abc.com>",
-  "Caitlyn Thomas <caitlyn.thomas@mail.abc.com>",
-  "Bill Johns <sami.begg@mail.abc.com>",
+  "Alexandra Hamilton <alexandra.hamilton@mail.forgemission.com>",
+  "Aaron Adams <aaron.adams@mail.forgemission.com>",
+  "Sara Madison <sara.madison@mail.forgemission.com>",
+  "Allie Jackson <allie.jackson@mail.forgemission.com>",
+  "Caitlyn Thomas <caitlyn.thomas@mail.forgemission.com>",
+  "Sami Begg <sami.begg@mail.forgemission.com>",
 ];
 
 // --- Correct Helper Functions ---
