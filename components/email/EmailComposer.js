@@ -39,7 +39,7 @@ export default function EmailComposer({ contact, onEmailSent }) { // Added onEma
 
   const emailTemplates = [
     { id: 'blank', name: '-- No Template --', subject: '', body: `\n\nBest,\n{{user.name}}` }, // Default blank with signature
-    { id: 'ai-intro', name: 'AI Intro - non tech leader', 
+    { id: 'ai-intro-ntl', name: 'AI Intro - non tech leader', 
       subject: `Serious improvements using AI for {{contact.organization_name}}`, 
       body: `Hey {{contact.first_name}}, hope you are well.\n
 Very impressed by your success with {{contact.industry}}. I've been working in IT modernization leveraging AI and wanted to run something by you.\n
@@ -52,6 +52,18 @@ Thanks,
 Principal Engineer
 Forge Mission\n` 
     },  
+    { id: 'ai-intro-train', name: 'Weekly offer', 
+      subject: `{{contact.first_name}}, empower your team for the AI modernization wave`, 
+      body: `Hello {{contact.first_name}}, hope things are going great for you!
+My collegue Alex reached out a few weeks ago regarding AI enablement for {{contact.organization_name}} and I'd like to follow up...\n
+We are empowering Ops teams across the {{contact.industry}} space globally, offering weekly 1-hour live-interactive sessions on real strategies to effectively use AI for routine tasks and complex workflows, improving efficiency, reducing costs and boosting revenue. Similar companies are already engaged, moving the needle from Day 1 and seeing great success quickly.
+Are you interested? 10 second intro here: https://www.forgemission.com/ai/services \n
+Please let me know if you have 15 mins to discuss?
+Best,
+{{user.name}}
+Principal Engineer
+Forge Mission\n` 
+  },  
   { id: 'ai-intro', name: 'AI Intro - training', 
         subject: `Hi {{contact.first_name}}, free AI Training for {{contact.organization_name}}`, 
         body: `Hi {{contact.first_name}}, hope you are well.\n
