@@ -71,7 +71,7 @@ Forge Mission\n`
       body: `Hello {{contact.first_name}}, hope things are going great for you!
 My collegue Alex reached out a few weeks ago regarding AI enablement for {{contact.organization_name}} and I'd like to follow up...\n
 We are empowering Ops teams across the {{contact.industry}} space globally, offering weekly 1-hour live-interactive sessions on real strategies to effectively use AI for routine tasks and complex workflows, improving efficiency, reducing costs and boosting revenue. Similar companies are already engaged, moving the needle from Day 1 and seeing great success quickly.
-Are you interested? 10 second intro here: https://www.forgemission.com/ai/services \n
+Are you interested? 10 second intro here: <a href="https://www.forgemission.com/ai/services" target="_blank" rel="noopener noreferrer">Forge Mission AI Services</a>\n
 Please let me know if you have 15 mins to discuss?
 Best,
 {{user.name}}
