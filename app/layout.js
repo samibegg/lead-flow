@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Lead Flow CRM',
-  description: 'Manage your leads efficiently',
+  title: 'Lead Flow',
+  description: 'Manage leads efficiently',
 };
 
 export default function RootLayout({ children }) {
